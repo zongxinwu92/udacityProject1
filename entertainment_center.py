@@ -1,5 +1,5 @@
-from project1 import media
-from project1.ud036_StarterCode import fresh_tomatoes
+import media
+from ud036_StarterCode import fresh_tomatoes
 
 """the instances and show final website"""
 
