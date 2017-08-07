@@ -2,6 +2,7 @@ import webbrowser
 
 """create a website to show my favorite movies"""
 
+
 class Movie():
     def __init__(self, movie_title, poster_image_url, trailer_youtube_id):
         self.title = movie_title
