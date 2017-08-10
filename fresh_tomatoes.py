@@ -1,4 +1,10 @@
+import webbrowser
+import os
+import re
 
+
+# Styles and scripting for the page
+main_page_head = '''
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,7 +86,11 @@
         });
     </script>
 </head>
+'''
 
+
+# The main page layout and title bar
+main_page_content = '''
   <body>
     <!-- Trailer Video Modal -->
     <div class="modal" id="trailer">
@@ -107,37 +117,57 @@
       </div>
     </div>
     <div class="container">
-      
-<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="PAm8PV47jMM" data-toggle="modal" data-target="#trailer">
-    <img src="http://i.cdn.turner.com/v5cache/TBS/Images/Dynamic/i450/vizio-the-big-bang-theory-960x1440.png" width="220" height="342">
-    <h2>The Big Bang Theory</h2>
-</div>
-
-<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="meF4MfQ3jMw" data-toggle="modal" data-target="#trailer">
-    <img src="https://almostelysian.files.wordpress.com/2015/09/modern-family.jpg?w=640" width="320" height="342">
-    <h2>Modern Family</h2>
-</div>
-
-<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="f-V6dYUkneU" data-toggle="modal" data-target="#trailer">
-    <img src="http://i.gtimg.cn/qqlive/img/jpgcache/files/qqvideo/2/2ih1wnad4h30y5n.jpg" width="250" height="342">
-    <h2>2 Broken Girls</h2>
-</div>
-
-<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="RDlXdujRSD8" data-toggle="modal" data-target="#trailer">
-    <img src="https://images-na.ssl-images-amazon.com/images/M/MV5BMTU2NjQ1Nzc4MF5BMl5BanBnXkFtZTcwNTM0NDk1Mw@@._V1_UY1200_CR89,0,6301200_AL_.jpg" width="220" height="342">
-    <h2>Flipped</h2>
-</div>
-
-<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="8QnMmpfKWvo" data-toggle="modal" data-target="#trailer">
-    <img src="http://img1.gtimg.com/tech/pics/hv1/18/14/1259/81870063.jpg" width="220" height="342">
-    <h2>House of Cards</h2>
-</div>
-
-<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="JAh-5K2F7dI" data-toggle="modal" data-target="#trailer">
-    <img src="http://i.gtimg.cn/qqlive/img/jpgcache/files/qqvideo/q/qk8vyb5drwnn174.jpg" width="230" height="342">
-    <h2>Devious Maids</h2>
-</div>
-
+      {movie_tiles}
     </div>
   </body>
 </html>
+'''
+
+
+# A single movie entry html template
+movie_tile_content = '''
+<div class="col-md-6 col-lg-4 movie-tile text-center" data-trailer-youtube-id="{trailer_youtube_id}" data-toggle="modal" data-target="#trailer">
+    <img src="{poster_image_url}" width="{width}" height="342">
+    <h2>{movie_title}</h2>
+</div>
+'''
+
+
+def create_movie_tiles_content(movies):
+    # The HTML content for this section of the page
+    content = ''
+    myWidth = [220, 320, 250, 220, 220, 230]
+    for index, movie in enumerate(movies):
+        # Extract the youtube ID from the url
+        youtube_id_match = re.search(
+            r'(?<=v=)[^&#]+', movie.trailer_youtube_id)
+        youtube_id_match = youtube_id_match or re.search(
+            r'(?<=be/)[^&#]+', movie.trailer_youtube_id)
+        trailer_youtube_id = (youtube_id_match.group(0) if youtube_id_match
+                              else None)
+
+        # Append the tile for the movie with its content filled in
+        content += movie_tile_content.format(
+            movie_title=movie.title,
+            poster_image_url=movie.poster_image_url,
+            trailer_youtube_id=trailer_youtube_id,
+            width=myWidth[index]
+        )
+    return content
+
+
+def open_movies_page(movies):
+    # Create or overwrite the output file
+    output_file = open('fresh_tomatoes.html', 'w')
+
+    # Replace the movie tiles placeholder generated content
+    rendered_content = main_page_content.format(
+        movie_tiles=create_movie_tiles_content(movies))
+
+    # Output the file
+    output_file.write(main_page_head + rendered_content)
+    output_file.close()
+
+    # open the output file in the browser (in a new tab, if possible)
+    url = os.path.abspath(output_file.name)
+    webbrowser.open('file://' + url, new=2)

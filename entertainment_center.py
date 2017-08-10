@@ -1,5 +1,5 @@
 import media
-from ud036_StarterCode import fresh_tomatoes
+import fresh_tomatoes
 
 """the instances and show final website"""
 
