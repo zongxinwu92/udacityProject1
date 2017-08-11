@@ -34,7 +34,13 @@ devious_maids = media.Movie("Devious Maids",
                              "qqvideo/q/qk8vyb5drwnn174.jpg"),
                             "https://www.youtube.com/watch?v=JAh-5K2F7dI")
 
+# First param is title of movie, second param is the url of post image, the third is url of movie trailer.
+
 movies = [tbbt, modern_family, broken_girls, flipped, house_of_cards,
           devious_maids]
+# build a list for the following function
 
 fresh_tomatoes.open_movies_page(movies)
+
+# print(media.Movie.__doc__)
+# print the documentation
